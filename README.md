@@ -8,7 +8,7 @@ See [Automated Nginx Reverse Proxy for Docker][2] for why you might want to use 
 
 To run it:
 
-    $ docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro hasufell/nginx-proxy
+    $ docker run -d -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro hasufell/exherbo-nginx-proxy
 
 Then start any containers you want proxied with an env var `VIRTUAL_HOST=subdomain.youdomain.com`
 
@@ -53,7 +53,7 @@ when starting the backend container.
 
 To set the default host for nginx use the env var `DEFAULT_HOST=foo.bar.com` for example
 
-    $ docker run -d -p 80:80 -e DEFAULT_HOST=foo.bar.com -v /var/run/docker.sock:/tmp/docker.sock:ro hasufell/nginx-proxy
+    $ docker run -d -p 80:80 -e DEFAULT_HOST=foo.bar.com -v /var/run/docker.sock:/tmp/docker.sock:ro hasufell/exherbo-nginx-proxy
 
 
 ### Separate Containers
@@ -63,7 +63,7 @@ image and the official [nginx](https://registry.hub.docker.com/_/nginx/) image.
 
 You may want to do this to prevent having the docker socket bound to a publicly exposed container service.
 
-To run nginx proxy as a separate container you'll need to have [nginx.tmpl](https://github.com/hasufell/nginx-proxy/blob/master/nginx.tmpl) on your host system.
+To run nginx proxy as a separate container you'll need to have [nginx.tmpl](https://github.com/hasufell/exherbo-nginx-proxy/blob/master/nginx.tmpl) on your host system.
 
 First start nginx with a volume:
 
@@ -90,7 +90,7 @@ certificates or optionally specifying a cert name (for SNI) as an environment va
 
 To enable SSL:
 
-    $ docker run -d -p 80:80 -p 443:443 -v /path/to/certs:/etc/nginx/certs -v /var/run/docker.sock:/tmp/docker.sock:ro hasufell/nginx-proxy
+    $ docker run -d -p 80:80 -p 443:443 -v /path/to/certs:/etc/nginx/certs -v /var/run/docker.sock:/tmp/docker.sock:ro hasufell/exherbo-nginx-proxy
 
 The contents of `/path/to/certs` should contain the certificates and private keys for any virtual
 hosts in use.  The certificate and keys should be named after the virtual host with a `.crt` and
@@ -152,7 +152,7 @@ $ docker run -d -p 80:80 -p 443:443 \
     -v /path/to/htpasswd:/etc/nginx/htpasswd \
     -v /path/to/certs:/etc/nginx/certs \
     -v /var/run/docker.sock:/tmp/docker.sock:ro \
-    hasufell/nginx-proxy
+    hasufell/exherbo-nginx-proxy
 ```
 
 You'll need apache2-utils on the machine where you plan to create the htpasswd file. Follow these [instructions](http://httpd.apache.org/docs/2.2/programs/htpasswd.html)
@@ -168,7 +168,7 @@ To add settings on a proxy-wide basis, add your configuration file under `/etc/n
 This can be done in a derived image by creating the file in a `RUN` command or by `COPY`ing the file into `conf.d`:
 
 ```Dockerfile
-FROM hasufell/nginx-proxy
+FROM hasufell/exherbo-nginx-proxy
 RUN { \
       echo 'server_tokens off;'; \
       echo 'client_max_body_size 100m;'; \
@@ -177,7 +177,7 @@ RUN { \
 
 Or it can be done by mounting in your custom configuration in your `docker run` command:
 
-    $ docker run -d -p 80:80 -p 443:443 -v /path/to/my_proxy.conf:/etc/nginx/conf.d/my_proxy.conf:ro -v /var/run/docker.sock:/tmp/docker.sock:ro hasufell/nginx-proxy
+    $ docker run -d -p 80:80 -p 443:443 -v /path/to/my_proxy.conf:/etc/nginx/conf.d/my_proxy.conf:ro -v /var/run/docker.sock:/tmp/docker.sock:ro hasufell/exherbo-nginx-proxy
 
 #### Per-VIRTUAL_HOST
 
@@ -187,7 +187,7 @@ In order to allow virtual hosts to be dynamically configured as backends are add
 
 For example, if you have a virtual host named `app.example.com`, you could provide a custom configuration for that host as follows:
 
-    $ docker run -d -p 80:80 -p 443:443 -v /path/to/vhost.d:/etc/nginx/vhost.d:ro -v /var/run/docker.sock:/tmp/docker.sock:ro hasufell/nginx-proxy
+    $ docker run -d -p 80:80 -p 443:443 -v /path/to/vhost.d:/etc/nginx/vhost.d:ro -v /var/run/docker.sock:/tmp/docker.sock:ro hasufell/exherbo-nginx-proxy
     $ { echo 'server_tokens off;'; echo 'client_max_body_size 100m;'; } > /path/to/vhost.d/app.example.com
 
 If you are using multiple hostnames for a single container (e.g. `VIRTUAL_HOST=example.com,www.example.com`), the virtual host configuration file must exist for each hostname. If you would like to use the same configuration for multiple virtual host names, you can use a symlink:
